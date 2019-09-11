@@ -33,19 +33,15 @@ public class GameActivity extends AppCompatActivity {
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
-        //timer task and handler to run the game.
-        Timer timer = new Timer();
-        timer.scheduleAtFixedRate(new TimerTask() {
+        //Handler to run the game.
+        final Runnable runnable = new Runnable() {
             @Override
             public void run() {
-                gameHandler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        game.invalidate();
-                    }
-                });
+               game.invalidate();
+               gameHandler.postDelayed(this, 0);
             }
-            //sets delay (which I do not want) and draw period.
-        }, 0, fps);
+        };
+
+        runnable.run();
     }
 }
