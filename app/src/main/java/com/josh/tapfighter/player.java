@@ -1,13 +1,31 @@
 package com.josh.tapfighter;
 
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+
 public class player extends fighter {
 
     //private member variables
-    private int hp;
+    private int hp; //fighter hit points.
+    private int width;
+    private int height;
 
-    public player(int hp) {
-        super(hp);
+    private Bitmap frame1;
+    private Bitmap frame2;
+
+    private boolean punch;
+    private int damage;
+
+    public player(Context context, int hp, int width, int height) {
+        super();
         this.hp = hp;
+        this.width = width;
+        this.height = height;
+
+        frame1 = BitmapFactory.decodeResource(context.getResources(), R.drawable.blufighter);
+        frame2 = BitmapFactory.decodeResource(context.getResources(), R.drawable.blufighter1);
+
     }
 
     @Override
@@ -20,5 +38,49 @@ public class player extends fighter {
     public int getHp() {
         //return hp.
         return hp;
+    }
+
+    @Override
+    public int getWidth() {
+        return width;
+    }
+
+    @Override
+    public int getHeight() {
+        return height;
+    }
+
+    @Override
+    public void setPunch(boolean p) {
+        punch = p;
+    }
+
+    @Override
+    public boolean getPunch() {
+        return punch;
+    }
+
+    @Override
+    public void setDamage(int d) {
+        damage = d;
+    }
+
+    @Override
+    public int getDamage() {
+        return damage;
+    }
+
+    @Override
+    public Bitmap getSprite1() {
+        frame1 = Bitmap.createScaledBitmap(frame1, width / 3,
+                height / 2, true);
+        return frame1;
+    }
+
+    @Override
+    public Bitmap getSprite2() {
+        frame2 = Bitmap.createScaledBitmap(frame2, width / 3,
+                height / 2, true);
+        return frame2;
     }
 }
