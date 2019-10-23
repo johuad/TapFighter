@@ -6,55 +6,48 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Typeface;
 import android.view.MotionEvent;
 import android.view.View;
 
 public class GameView extends View {
-    //private member variables for GameView
-    private Canvas canvas;
-    private Bitmap blufighter;
-    private Bitmap blufighter1;
-    private Bitmap redfighter;
-    private Bitmap redfighter1;
+
     private Bitmap ring;
-    private Paint textPaint;
+    private Bitmap playerHealthBar;
+    private Bitmap enemyHealthBar;
+    private Bitmap healthBarOutline;
+
     private int width;
     private int height;
+    private int timer;
+
     private player gamePlayer;
     private enemy gameEnemy;
-    private boolean punch = false;
-    private boolean ePunch = false;
-    private int ePunchTimer = 0;
-    private int diff;
 
-    public GameView(Context context, int diff) {
+    public GameView(Context context, int d, int w, int h) {
         super(context);
 
-        //sets difficulty every time the game is started.
-        this.diff = diff;
+        this.width = w;
+        this.height = h;
 
         //player and enemy objects.
-        gamePlayer = new player(100);
-        gameEnemy = new enemy(100);
+        gamePlayer = new player(context, 1000, width, height);
+        gameEnemy = new enemy(context, 1000, width, height);
 
-        //font stuff for displaying HP.
-        textPaint = new Paint();
-        textPaint.setTextSize(50);
-        textPaint.setTypeface(Typeface.create(Typeface.SERIF, Typeface.BOLD_ITALIC));
-        textPaint.setColor(Color.BLACK);
+        //set player and enemy damage.
+        //enemy uses value passed in by difficulty settings.
+        gamePlayer.setDamage(10);
+        gameEnemy.setDamage(d);
 
         //bitmap for ring
         ring = BitmapFactory.decodeResource(getResources(), R.drawable.ring);
+        ring = Bitmap.createScaledBitmap(ring, width, height, true);
 
-        //bitmaps for player
-        blufighter = BitmapFactory.decodeResource(getResources(), R.drawable.blufighter);
-        blufighter1 = BitmapFactory.decodeResource(getResources(), R.drawable.blufighter1);
+        healthBarOutline = BitmapFactory.decodeResource(getResources(), R.drawable.hp2);
+        healthBarOutline = Bitmap.createScaledBitmap(healthBarOutline, 500, height / 10, true);
 
-        //bitmaps for npc enemy.
-        redfighter = BitmapFactory.decodeResource(getResources(), R.drawable.redfighter);
-        redfighter1 = BitmapFactory.decodeResource(getResources(), R.drawable.redfighter1);
+        playerHealthBar = BitmapFactory.decodeResource(getResources(), R.drawable.hp1);
+
+        enemyHealthBar = BitmapFactory.decodeResource(getResources(), R.drawable.hp1);
 
     }
 
@@ -62,79 +55,114 @@ public class GameView extends View {
     public void onDraw(final Canvas canvas) {
         super.onDraw(canvas);
 
-        //set width and height of canvas.
-        width = canvas.getWidth();
-        height = canvas.getHeight();
+        update(canvas);
 
-        //fills in background color
-        canvas.drawColor(Color.WHITE);
+    }
 
-        //display HP of both fighters.
-        canvas.drawText("HP: " + this.gamePlayer.getHp(),
-                (width/3) - blufighter.getWidth(), (height/10), textPaint);
+    public void update(Canvas canvas) {
+        try {
+            //fills in background color
+            canvas.drawColor(Color.WHITE);
 
-        canvas.drawText("HP: " + this.gameEnemy.getHp(),
-                (width/3) + blufighter.getWidth() * 2, (height/10), textPaint);
+            //draws ring.
+            canvas.drawBitmap(ring,
+                    (width / 2) - ring.getWidth() / 2,
+                    (height / 2) - (ring.getHeight())/2,
+                    null);
 
-        //draws ring.
-        canvas.drawBitmap(ring, (width/2) - ring.getWidth()/2,
-                (height/2) - (ring.getHeight())/2, null);
+            //display HP of both fighters
+            canvas.drawBitmap(healthBarOutline,
+                    0,
+                    0,
+                    null
+            );
 
-        //draws player based on whether or not they are pressing on the screen.
-        if(punch) {
-            canvas.drawBitmap(blufighter1, (width/2) - blufighter.getWidth(),
-                    (height/2) - blufighter.getHeight()/2, null);
-            //knock 1 hp off of the enemy every time a punch happens.
-            this.gameEnemy.setHp(1);
+            canvas.drawBitmap(healthBarOutline,
+                    width - healthBarOutline.getWidth(),
+                    0,
+                    null
+            );
 
-            if(gameEnemy.getHp() == 0) {
-                //if enemy hp = 0 launch victory activity
-                Intent victory = new Intent(getContext(), VictoryActivity.class);
-                //start new activity and destroy the previous one (hitting back will exit instead
-                //of taking you back to the old game screen
-                victory.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                //start the gameOver activity
-                getContext().startActivity(victory);
+            int playerHealth = gamePlayer.getHp() / 2;
+            int enemyHealth = gameEnemy.getHp() / 2;
+
+            if(playerHealth > 0)
+            {
+                playerHealthBar = Bitmap.createScaledBitmap(playerHealthBar, playerHealth, height / 10, true);
+
+                canvas.drawBitmap(playerHealthBar,
+                        0,
+                        0,
+                        null
+                );
+            }
+
+            if(enemyHealth > 0)
+            {
+                enemyHealthBar = Bitmap.createScaledBitmap(enemyHealthBar, enemyHealth, height / 10, true);
+
+                canvas.drawBitmap(enemyHealthBar,
+                        width - enemyHealthBar.getWidth(),
+                        0,
+                        null
+                        );
+            }
+
+            //player animation
+            if(!gamePlayer.getPunch()) {
+                canvas.drawBitmap(gamePlayer.getSprite1(),
+                        (width / 2) - (gamePlayer.getWidth() / 4),
+                        (height / 2) - (gamePlayer.getHeight() / 3),
+                        null);
+            }
+            else {
+                canvas.drawBitmap(gamePlayer.getSprite2(),
+                        (width / 2) - (gamePlayer.getWidth() / 4),
+                        (height / 2) - (gamePlayer.getHeight() / 3),
+                        null);
+
+                gamePlayer.setPunch(false);
+
+                gameEnemy.setHp(gamePlayer.getDamage());
+
+                if(gameEnemy.getHp() <= 0) {
+                    Intent victory = new Intent(getContext(), VictoryActivity.class);
+                    victory.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    getContext().startActivity(victory);
+                }
 
             }
-            //set punch back to false.
-            punch = false;
-        }
-        else {
-            //draws the regular non-punching blufighter.
-            canvas.drawBitmap(blufighter, (width/2) - blufighter1.getWidth(),
-                    (height/2) - blufighter1.getHeight()/2, null);
-        }
 
-        //kind of a dirty hack. Increments ePunchTimer and then
-        //draws sprites based on the value of the timer, then
-        //resets the timer and decrements player HP.
-        if(!ePunch)
-            ePunchTimer++;
+            //enemy animation
+            if(!gameEnemy.getPunch()){
+                timer++;
+            }
 
-        if(ePunchTimer % 30 == 0) {
-            //if ePunchTimer / difficulty has no remainder draw punch sprite.
-            canvas.drawBitmap(redfighter1, (width/2) - redfighter1.getWidth()/2,
-                    (height/2) - redfighter1.getHeight()/2, null);
-            //set ePunchTimer back to 0 so it doesn't get crazy big.
-            ePunchTimer = 0;
-            //decrement player HP with each punch.
-            this.gamePlayer.setHp(diff);
+            if(timer == 30) {
+                canvas.drawBitmap(gameEnemy.getSprite2(),
+                        (width / 2) - (gameEnemy.getWidth() / 8),
+                        (height / 2) - (gameEnemy.getHeight() / 3),
+                        null);
+                gameEnemy.setPunch(true);
+                gamePlayer.setHp(gameEnemy.getDamage());
+                timer = 0;
 
-            if(gamePlayer.getHp() <= 0 ) {
-                //if player HP = 0 launch game over activity
-                Intent gameOver = new Intent(getContext(), GameOverActivity.class);
-                //start new activity and destroy the previous one (hitting back will exit instead
-                //of taking you back to the old game screen
-                gameOver.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                //start the gameOver activity
-                getContext().startActivity(gameOver);
-
+                if(gamePlayer.getHp() <= 0) {
+                    Intent gameOver = new Intent(getContext(), GameOverActivity.class);
+                    gameOver.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    getContext().startActivity(gameOver);
+                }
+            }
+            else {
+                canvas.drawBitmap(gameEnemy.getSprite1(),
+                        (width / 2) - gameEnemy.getWidth() / 8,
+                        (height / 2) - (gameEnemy.getHeight() / 3),
+                        null);
+                gameEnemy.setPunch(false);
             }
         }
-        else {
-            canvas.drawBitmap(redfighter, (width/2) - redfighter1.getWidth()/2,
-                    (height/2) - redfighter1.getHeight()/2, null);
+        catch(Exception e) {
+
         }
     }
 
@@ -142,10 +170,8 @@ public class GameView extends View {
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         if(event.getAction() == MotionEvent.ACTION_DOWN) {
-            //when the user pushes on the screen it sets punch = true
-            //when punch is true onDraw animates the punch and sets punch to false again.
-            punch = true;
+            gamePlayer.setPunch(true);
         }
-        return punch;
+        return gamePlayer.getPunch();
     }
 }
