@@ -39,17 +39,17 @@ public class DifficultyActivity extends AppCompatActivity {
                 switch(checkedId) {
                     case R.id.easyMode:
                         //default is 3, but we set this up anyway in case difficulty is lowered.
-                        editor.putInt("diff_key", 3);
+                        editor.putInt("diff_key", 15);
                         editor.commit();
                     break;
                     case R.id.midMode:
                         //sets damage to 6
-                        editor.putInt("diff_key", 6);
+                        editor.putInt("diff_key", 30);
                         editor.commit();
                     break;
                     case R.id.hardMode:
                         //sets damage to 9.
-                        editor.putInt("diff_key", 9);
+                        editor.putInt("diff_key", 45);
                         editor.commit();
                 }
             }

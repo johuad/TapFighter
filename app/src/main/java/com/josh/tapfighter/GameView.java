@@ -6,8 +6,11 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+
+import java.util.Random;
 
 public class GameView extends View {
 
@@ -19,9 +22,18 @@ public class GameView extends View {
     private int width;
     private int height;
     private int timer;
+    private int counter;
 
     private player gamePlayer;
     private enemy gameEnemy;
+
+    private blueOrb bOrb;
+
+    private blueOrb[] orbs;
+
+    private boolean orbTouched = false;
+
+    private Random r = new Random();
 
     public GameView(Context context, int d, int w, int h) {
         super(context);
@@ -43,11 +55,21 @@ public class GameView extends View {
         ring = Bitmap.createScaledBitmap(ring, width, height, true);
 
         healthBarOutline = BitmapFactory.decodeResource(getResources(), R.drawable.hp2);
-        healthBarOutline = Bitmap.createScaledBitmap(healthBarOutline, 500, height / 10, true);
+        healthBarOutline = Bitmap.createScaledBitmap(healthBarOutline, 500,
+                height / 10, true);
 
         playerHealthBar = BitmapFactory.decodeResource(getResources(), R.drawable.hp1);
 
         enemyHealthBar = BitmapFactory.decodeResource(getResources(), R.drawable.hp1);
+
+        orbs = new blueOrb[1];
+
+        bOrb = new blueOrb(getResources());
+
+        bOrb.x = r.nextInt(width - bOrb.width);
+        bOrb.y = r.nextInt(height - bOrb.height);
+
+        orbs[0] = bOrb;
 
     }
 
@@ -61,9 +83,11 @@ public class GameView extends View {
 
     public void update(Canvas canvas) {
         try {
+            int playerHealth = gamePlayer.getHp() / 2;
+            int enemyHealth = gameEnemy.getHp() / 2;
+
             //fills in background color
             canvas.drawColor(Color.WHITE);
-
             //draws ring.
             canvas.drawBitmap(ring,
                     (width / 2) - ring.getWidth() / 2,
@@ -83,12 +107,12 @@ public class GameView extends View {
                     null
             );
 
-            int playerHealth = gamePlayer.getHp() / 2;
-            int enemyHealth = gameEnemy.getHp() / 2;
-
             if(playerHealth > 0)
             {
-                playerHealthBar = Bitmap.createScaledBitmap(playerHealthBar, playerHealth, height / 10, true);
+                playerHealthBar = Bitmap.createScaledBitmap(playerHealthBar,
+                        playerHealth,
+                        height / 10,
+                        true);
 
                 canvas.drawBitmap(playerHealthBar,
                         0,
@@ -99,7 +123,10 @@ public class GameView extends View {
 
             if(enemyHealth > 0)
             {
-                enemyHealthBar = Bitmap.createScaledBitmap(enemyHealthBar, enemyHealth, height / 10, true);
+                enemyHealthBar = Bitmap.createScaledBitmap(enemyHealthBar,
+                        enemyHealth,
+                        height / 10,
+                        true);
 
                 canvas.drawBitmap(enemyHealthBar,
                         width - enemyHealthBar.getWidth(),
@@ -121,9 +148,13 @@ public class GameView extends View {
                         (height / 2) - (gamePlayer.getHeight() / 3),
                         null);
 
-                gamePlayer.setPunch(false);
+                if(counter < 10) {
+                    counter++;
+                }
 
                 gameEnemy.setHp(gamePlayer.getDamage());
+
+                gamePlayer.setPunch(false);
 
                 if(gameEnemy.getHp() <= 0) {
                     Intent victory = new Intent(getContext(), VictoryActivity.class);
@@ -134,9 +165,7 @@ public class GameView extends View {
             }
 
             //enemy animation
-            if(!gameEnemy.getPunch()){
-                timer++;
-            }
+            timer++;
 
             if(timer == 30) {
                 canvas.drawBitmap(gameEnemy.getSprite2(),
@@ -160,6 +189,22 @@ public class GameView extends View {
                         null);
                 gameEnemy.setPunch(false);
             }
+
+            if(counter == 10) {
+
+                //spawn an orb in a random location.
+                for(blueOrb orb : orbs) {
+                    canvas.drawBitmap(orb.getOrb(), orb.x, orb.y, null);
+                }
+            }
+
+            if(orbTouched) {
+                counter = 0;
+                bOrb.x = r.nextInt(width - bOrb.width);
+                bOrb.y = r.nextInt(height - bOrb.height);
+                gameEnemy.setHp(25);
+                orbTouched = false;
+            }
         }
         catch(Exception e) {
 
@@ -169,8 +214,16 @@ public class GameView extends View {
     //method for taking user input.
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        float x = event.getX();
+        float y = event.getY();
         if(event.getAction() == MotionEvent.ACTION_DOWN) {
             gamePlayer.setPunch(true);
+
+            for(blueOrb orb : orbs) {
+                if(x > orb.x && x < orb.x + orb.width && y > orb.y && y < orb.y + orb.height) {
+                    orbTouched = true;
+                }
+            }
         }
         return gamePlayer.getPunch();
     }
