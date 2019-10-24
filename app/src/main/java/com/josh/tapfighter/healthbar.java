@@ -6,8 +6,8 @@ import android.graphics.BitmapFactory;
 
 class healthbar {
 
-    Bitmap bar;
-    Bitmap outline;
+    private Bitmap bar;
+    private Bitmap outline;
 
     healthbar(Resources res) {
 
