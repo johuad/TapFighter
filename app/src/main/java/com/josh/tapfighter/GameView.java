@@ -14,9 +14,6 @@ import java.util.Random;
 public class GameView extends View {
 
     private Bitmap ring;
-    private Bitmap playerHealthBar;
-    private Bitmap enemyHealthBar;
-    private Bitmap healthBarOutline;
 
     private int width;
     private int height;
@@ -24,7 +21,9 @@ public class GameView extends View {
     private int counter;
 
     private player gamePlayer;
+    private healthbar playerHP;
     private enemy gameEnemy;
+    private healthbar enemyHP;
 
     private blueOrb bOrb;
 
@@ -53,13 +52,8 @@ public class GameView extends View {
         ring = BitmapFactory.decodeResource(getResources(), R.drawable.ring);
         ring = Bitmap.createScaledBitmap(ring, width, height, true);
 
-        healthBarOutline = BitmapFactory.decodeResource(getResources(), R.drawable.hp2);
-        healthBarOutline = Bitmap.createScaledBitmap(healthBarOutline, 500,
-                height / 10, true);
-
-        playerHealthBar = BitmapFactory.decodeResource(getResources(), R.drawable.hp1);
-
-        enemyHealthBar = BitmapFactory.decodeResource(getResources(), R.drawable.hp1);
+        playerHP = new healthbar(getResources());
+        enemyHP = new healthbar(getResources());
 
         orbs = new blueOrb[1];
 
@@ -94,45 +88,29 @@ public class GameView extends View {
                     null);
 
             //display HP of both fighters
-            canvas.drawBitmap(healthBarOutline,
+            playerHP.createBar(playerHealth, height / 10);
+            playerHP.createOutline(500, height / 10);
+            canvas.drawBitmap(playerHP.getOutline(),
+                    0,
+                    0,
+                    null);
+            canvas.drawBitmap(playerHP.getBar(),
                     0,
                     0,
                     null
-            );
+                    );
 
-            canvas.drawBitmap(healthBarOutline,
-                    width - healthBarOutline.getWidth(),
+            enemyHP.createBar(enemyHealth, height / 10);
+            enemyHP.createOutline(500, height / 10);
+            canvas.drawBitmap(enemyHP.getOutline(),
+                    width - enemyHP.getOutline().getWidth(),
                     0,
                     null
-            );
-
-            if(playerHealth > 0)
-            {
-                playerHealthBar = Bitmap.createScaledBitmap(playerHealthBar,
-                        playerHealth,
-                        height / 10,
-                        true);
-
-                canvas.drawBitmap(playerHealthBar,
-                        0,
-                        0,
-                        null
-                );
-            }
-
-            if(enemyHealth > 0)
-            {
-                enemyHealthBar = Bitmap.createScaledBitmap(enemyHealthBar,
-                        enemyHealth,
-                        height / 10,
-                        true);
-
-                canvas.drawBitmap(enemyHealthBar,
-                        width - enemyHealthBar.getWidth(),
-                        0,
-                        null
-                        );
-            }
+                    );
+            canvas.drawBitmap(enemyHP.getBar(),
+                    width - enemyHP.getBar().getWidth(),
+                    0,
+                    null);
 
             //player animation
             if(!gamePlayer.getPunch()) {
