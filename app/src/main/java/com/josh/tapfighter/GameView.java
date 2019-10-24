@@ -21,9 +21,9 @@ public class GameView extends View {
     private int counter;
 
     private player gamePlayer;
-    private healthbar playerHP;
+    private healthBar playerHP;
     private enemy gameEnemy;
-    private healthbar enemyHP;
+    private healthBar enemyHP;
 
     private blueOrb bOrb;
 
@@ -52,8 +52,8 @@ public class GameView extends View {
         ring = BitmapFactory.decodeResource(getResources(), R.drawable.ring);
         ring = Bitmap.createScaledBitmap(ring, width, height, true);
 
-        playerHP = new healthbar(getResources());
-        enemyHP = new healthbar(getResources());
+        playerHP = new healthBar(getResources());
+        enemyHP = new healthBar(getResources());
 
         orbs = new blueOrb[1];
 

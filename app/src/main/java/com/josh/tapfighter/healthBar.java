@@ -4,12 +4,12 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
-class healthbar {
+class healthBar {
 
     private Bitmap bar;
     private Bitmap outline;
 
-    healthbar(Resources res) {
+    healthBar(Resources res) {
 
         bar = BitmapFactory.decodeResource(res, R.drawable.hp1);
         outline = BitmapFactory.decodeResource(res, R.drawable.hp2);
