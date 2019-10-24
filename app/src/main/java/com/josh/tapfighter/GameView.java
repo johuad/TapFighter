@@ -6,7 +6,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -207,7 +206,7 @@ public class GameView extends View {
             }
         }
         catch(Exception e) {
-
+            e.printStackTrace();
         }
     }
 

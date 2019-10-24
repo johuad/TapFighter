@@ -4,7 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
-public class player extends fighter {
+class player extends fighter {
 
     //private member variables
     private int hp; //fighter hit points.
@@ -17,7 +17,7 @@ public class player extends fighter {
     private boolean punch;
     private int damage;
 
-    public player(Context context, int hp, int width, int height) {
+    player(Context context, int hp, int width, int height) {
         super();
         this.hp = hp;
         this.width = width;

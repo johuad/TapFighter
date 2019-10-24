@@ -2,10 +2,10 @@ package com.josh.tapfighter;
 
 import android.graphics.Bitmap;
 
-public abstract class fighter {
+abstract class fighter {
     //abstract class for fighter objects.
 
-    public fighter() {}
+    fighter() {}
 
     //abstract methods.
     public abstract void setHp(int h);
