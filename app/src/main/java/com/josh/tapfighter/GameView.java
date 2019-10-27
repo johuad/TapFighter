@@ -76,11 +76,9 @@ public class GameView extends View {
 
     public void update(Canvas canvas) {
         try {
-            int playerHealth = gamePlayer.getHp() / 2;
-            int enemyHealth = gameEnemy.getHp() / 2;
-
             //fills in background color
             canvas.drawColor(Color.WHITE);
+
             //draws ring.
             canvas.drawBitmap(ring,
                     (width / 2) - ring.getWidth() / 2,
@@ -88,6 +86,11 @@ public class GameView extends View {
                     null);
 
             //display HP of both fighters
+            int playerHealth = gamePlayer.getHp() / 2;
+            int enemyHealth = gameEnemy.getHp() / 2;
+
+            //player health
+            if(playerHealth > 0)
             playerHP.createBar(playerHealth, height / 10);
             playerHP.createOutline(500, height / 10);
             canvas.drawBitmap(playerHP.getOutline(),
@@ -100,6 +103,8 @@ public class GameView extends View {
                     null
                     );
 
+            //enemy health
+            if(enemyHealth > 0)
             enemyHP.createBar(enemyHealth, height / 10);
             enemyHP.createOutline(500, height / 10);
             canvas.drawBitmap(enemyHP.getOutline(),
@@ -125,10 +130,6 @@ public class GameView extends View {
                         (height / 2) - (gamePlayer.getHeight() / 3),
                         null);
 
-                if(counter < 10) {
-                    counter++;
-                }
-
                 gameEnemy.setHp(gamePlayer.getDamage());
 
                 gamePlayer.setPunch(false);
@@ -144,7 +145,7 @@ public class GameView extends View {
             //enemy animation
             timer++;
 
-            if(timer == 30) {
+            if(timer == 60) {
                 canvas.drawBitmap(gameEnemy.getSprite2(),
                         (width / 2) - (gameEnemy.getWidth() / 8),
                         (height / 2) - (gameEnemy.getHeight() / 3),
@@ -167,8 +168,11 @@ public class GameView extends View {
                 gameEnemy.setPunch(false);
             }
 
-            if(counter == 10) {
 
+            if(counter < 120)
+                counter++;
+
+            if(counter == 120) {
                 //spawn an orb in a random location.
                 for(blueOrb orb : orbs) {
                     canvas.drawBitmap(orb.getOrb(), orb.x, orb.y, null);
