@@ -42,9 +42,13 @@ public class GameActivity extends AppCompatActivity {
         //set up view.
         setContentView(game);
 
+        //start game thread.
         gameThread.start();
-        final Handler gameHandler = new Handler(gameThread.getLooper()); //creates handler to run the game
-        //Handler to run the game.
+
+        //set up the handler to run the game.
+        final Handler gameHandler = new Handler(gameThread.getLooper());
+
+        //runnable to run the game.
         final Runnable runnable = new Runnable() {
             @Override
             public void run() {
@@ -53,6 +57,7 @@ public class GameActivity extends AppCompatActivity {
             }
         };
 
+        //start the runnable.
         runnable.run();
     }
 
