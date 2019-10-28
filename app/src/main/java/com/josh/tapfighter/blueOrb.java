@@ -6,7 +6,7 @@ import android.graphics.BitmapFactory;
 
 import java.util.Random;
 
-public class blueOrb {
+class blueOrb {
 
     private Bitmap orb;
 
@@ -16,9 +16,8 @@ public class blueOrb {
     int x;
     int y;
 
-    private Random r = new Random();
 
-    public blueOrb(Resources res) {
+    blueOrb(Resources res) {
 
         orb = BitmapFactory.decodeResource(res, R.drawable.blueorb);
 
@@ -31,7 +30,7 @@ public class blueOrb {
         y = -height;
     }
 
-    public Bitmap getOrb() {
+    Bitmap getOrb() {
         return orb;
     }
 
